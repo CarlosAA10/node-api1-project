@@ -113,7 +113,7 @@ When the client makes a `PUT` request to `/api/users/:id`:
   - respond with HTTP status code `200` (OK).
   - return the newly updated _user document_.
 
-## Stretch Problems
+## Stretch Problems 
 
 To work on the stretch problems you'll need to enable the `cors` middleware. Follow these steps:
 
