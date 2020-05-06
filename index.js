@@ -39,20 +39,18 @@ server.get('/api/users', (req, res) => {
 server.get('/api/users/:id', (req, res) => {
     const id = req.params.id; 
 
-    if (!users) {
-        res.status(500).json({ errorMessage: "The user information could not be retrieved." }); 
+    const findUser = users.find(user => user.id == id)
+
+    if(!findUser) {
+        res.status(404).json({ message: "The user with the specified ID does not exist."  })
+    }
+
+    else if(findUser) {
+        res.status(200).json(findUser); 
     }
 
     else {
-        users.map(currentUser => {
-            if (id == currentUser.id) {
-                res.status(200).json(currentUser)
-            }
-    
-            else {
-                res.status(404).json({ errorMessage: "The User with the specified ID does not exist." }); 
-            }
-        })
+        res.status(500).json({ errorMessage: "The user information could not be retrieved." })
     }
 
 
@@ -74,7 +72,10 @@ server.get('/api/users/:id', (req, res) => {
 })
 
 server.post('/api/users', (req, res) => {
-    const userInformation = req.body; 
+    let userInformation = req.body; 
+
+    userInformation = { ...userInformation, id: ids.generate()}
+
 
     // creating if statement
     if(!req.body.name || !req.body.bio) {
@@ -91,14 +92,55 @@ server.post('/api/users', (req, res) => {
 
 server.delete("/api/users/:id", (req, res) => {
     const id = req.params.id; 
+    const findUser = users.find(user => user.id == id)
 
-    // find the user on the array and remove it 
+    if(findUser) {
+        users = users.filter(user => user.id != id); 
+        res.status(200).json({ message: "User Successfully deleted" })
+    }
+    else if(!findUser) {
+        res.status(404).json({ message: "The user with the specified ID does not exist." })
+    }
+    else {
+        res.status(500).json({ errorMessage: "The user could not be removed" }); 
+    }
 
-    // creating if statement
 
-    users = users.filter(user => user.id != id);
 
-    res.status(200).json(users); 
+
+})
+
+server.put('/api/users/:id', (req, res) => {
+    const id = req.params.id; 
+
+    let findUser = users.find(user => user.id == id)
+
+    console.log(findUser); 
+
+    if(!req.body.name || !req.body.bio) {
+        res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
+    }
+
+    if (findUser) {
+        users = users.map(user => {
+            if(user.id == id) {
+                // return req.body
+                return {...req.body, id: id}
+            }
+            else{
+                return user
+            }
+        })
+
+        res.status(200).json(users)
+    }
+    else if (!findUser) {
+        res.status(404).json({ message: "The user with the specified ID does not exist." })
+    }
+    else {
+        res.status(404).json({  message: "The user with the specified ID does not exist." })
+    }
+
 })
 
 
